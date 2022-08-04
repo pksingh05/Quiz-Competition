@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Quiz Competition</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+  </head>
+  <body>
+    <div id="app">
+      <div class="container mt-5 pt-5">
+        <div class="col-md-6 mx-auto">
+          <h3>Let's Start</h3>
+          <div v-for="question in questions">
+            <hr>
+            <p>[[question.question]]</p> 
+            <div class="form-check" v-for="ans in question.answer">
+              <input @change="checkAnswer($event,question.uid)" :value="ans.answer" class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
+              <label class="form-check-label" for="flexRadioDefault1">
+                [[ans.answer]]
+              </label>
+            </div>
+            </div>
+            <hr>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.8/dist/vue.js"></script>
+    <script>
+      var app = new Vue({
+        el: '#app',
+          delimiters: ['[[', ']]'],
+          data() {
+            return {
+              category : '{{category}}',
+              questions : []
+            }
+          },
+          methods : {
+            getQuestions(){
+              var _this = this
+              fetch(`/api/get-quiz/?category=${_this.category}`)
+              .then(response => response.json())
+              .then(result =>{
+                _this.questions = result.data
+                console.log(result)
+              })
+            },
+            checkAnswer(event,uid){
+              this.questions.map(question => {
+                console.log(question.answer)
+                answers = question.answer
+                for(var i=0;i<answers.length;i++){
+                  if(answers[i].answer == event.target.value){
+                    if(answers[i].is_correct){
+                      console.log('Your answer is Correct')
+                      alert("Hurray ! your answer is correct !")                      
+                    }else{
+                      console.log('Your answer is inccorrect')
+                      alert('Sorry Try again!!')
+                    }
+                  }
+                }
+              }
+              )
+              console.log(event.target.value,uid)
+            }
+          },
+          created() {
+            this.getQuestions()
+            console.log('Page loaded')
+          },
+        });
+    </script>
+  </body>
+</html>
